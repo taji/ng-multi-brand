@@ -1,0 +1,73 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Define custom theme colors using CSS custom properties
+$primary-palette: mat.define-palette((
+  50: var(--brand-primary, #e3f2fd),
+  100: var(--brand-primary, #bbdefb),
+  200: var(--brand-primary, #90caf9),
+  300: var(--brand-primary, #64b5f6),
+  400: var(--brand-primary, #42a5f5),
+  500: var(--brand-primary, #2196f3),
+  600: var(--brand-primary, #1e88e5),
+  700: var(--brand-primary, #1976d2),
+  800: var(--brand-primary, #1565c0),
+  900: var(--brand-primary, #0d47a1),
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+));
+
+$accent-palette: mat.define-palette((
+  50: var(--brand-secondary, #fce4ec),
+  100: var(--brand-secondary, #f8bbd9),
+  200: var(--brand-secondary, #f48fb1),
+  300: var(--brand-secondary, #f06292),
+  400: var(--brand-secondary, #ec407a),
+  500: var(--brand-secondary, #e91e63),
+  600: var(--brand-secondary, #d81b60),
+  700: var(--brand-secondary, #c2185b),
+  800: var(--brand-secondary, #ad1457),
+  900: var(--brand-secondary, #880e4f),
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+));
+
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($theme);
+
+:root {
+  --brand-primary: #2196f3;
+  --brand-secondary: #e91e63;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
