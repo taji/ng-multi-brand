@@ -57,5 +57,5 @@ app.get('/api/content/:brandId', (req, res) => {
 
 const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`Mock CMS server running on http://localhost:${PORT}`);
+  console.log(`Mock BFF server running on http://localhost:${PORT}`);
 });
