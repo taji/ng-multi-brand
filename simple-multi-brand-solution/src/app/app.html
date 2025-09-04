@@ -1,23 +1,9 @@
-    <div class="app-container">
-      @if (brandService.getCurrentBrand()(); as brand) {
-        <mat-toolbar color="primary">
-          <img [src]="brand.logo" [alt]="brand.name" class="logo">
-          <span>{{ brand.name }}</span>
-        </mat-toolbar>
+<div>
+  <h2>NG Rxjs Implementation</h2>
+  <app-brand-rxjs-display></app-brand-rxjs-display>
 
-        <main class="main-content">
-          @if (brandService.getContent()(); as content) {
-            <mat-card class="hero-card">
-              <img [src]="content.heroImage" [alt]="content.title" class="hero-image">
-              <mat-card-content>
-                <h1>{{ content.title }}</h1>
-                <p>{{ content.subtitle }}</p>
-                <button mat-raised-button color="primary">{{ content.ctaText }}</button>
-              </mat-card-content>
-            </mat-card>
-          }
-        </main>
-      } @else {
-        <div class="loading">Loading brand...</div>
-      }
-    </div>
+  <div style="margin-top: 100px;"></div>
+
+  <h2>NG Signals Implementation</h2>
+  <app-brand-signals-display></app-brand-signals-display>
+</div>

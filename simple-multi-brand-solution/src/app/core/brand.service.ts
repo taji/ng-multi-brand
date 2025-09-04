@@ -1,20 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-export interface Brand {
-  id: string;
-  name: string;
-  primaryColor: string;
-  secondaryColor: string;
-  logo: string;
-}
-
-export interface BrandContent {
-  title: string;
-  subtitle: string;
-  heroImage: string;
-  ctaText: string;
-}
+import { Brand, BrandContent } from './brand.interface';
 
 @Injectable({ providedIn: 'root' })
 export class BrandService {
