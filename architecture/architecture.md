@@ -58,27 +58,28 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant A as App Component<br>(Client Zone)
-    participant DOM as DOM/CSS<br>(Client Zone)
-    participant BS as Brand Service<br>(Client Zone)
-    participant BFF as Backend For Frontend<br>(Application Zone)
-    participant AS as AWS AppSync<br>(Data Zone)
-    participant S3CF as Amazon S3/CloudFront<br>(Data Zone)
-    
-    U->>A: Visit ?brand=acme
+    participant R as Angular Router
+    participant A as App Component
+    participant BS as Brand Service
+    participant TS as Theme Service
+    participant UI as UI Components
+    participant DOM as DOM/CSS
+    participant BFF as Backend For Frontend
+
+    U->>R: Visit ?brand=acme
+    R->>A: Activate with query param
     A->>BS: loadBrand('acme')
     BS->>BFF: Request Brand & Content Data
-    BFF->>AS: GraphQL Query (Brand Config)
-    AS-->>BFF: Brand config (includes asset keys)
-    BFF->>AS: GraphQL Query (Content Data)
-    AS-->>BFF: Content data (includes asset keys)
-    BFF->>BFF: Generate CloudFront Signed URLs for assets
-    BFF-->>BS: Aggregated Brand & Content Data (with signed URLs)
-    BS->>A: Update component (with theme data)
-    A->>DOM: Apply CSS variables
-    A->>S3CF: GET Asset (using signed URL)
-    S3CF-->>A: Asset data
-    A->>U: Render branded UI
+    BFF-->>BS: Aggregated brand data
+    BS->>BS: Update internal state (Subjects)
+
+    alt Reactive Updates
+        BS-->>UI: UI Components react to new brand state
+        UI->>U: Render brand name, logo, etc.
+
+        BS-->>TS: Theme Service reacts to new brand state
+        TS->>DOM: Apply CSS variables for theme
+    end
 ```
 
 ## Key Components

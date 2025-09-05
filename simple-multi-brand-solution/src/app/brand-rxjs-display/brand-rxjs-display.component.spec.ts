@@ -1,14 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrandRxjsDisplayComponent } from './brand-rxjs-display.component';
-import { BrandRxjsService } from '../core/brand-rxjs.service';
+import { BrandService } from '../core/brand.service';
 import { of, Subject } from 'rxjs';
 import { Brand, BrandContent } from '../core/brand.interface';
-import { ActivatedRoute } from '@angular/router';
 
 describe('BrandRxjsDisplayComponent', () => {
   let component: BrandRxjsDisplayComponent;
   let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
-  let mockBrandRxjsService: any;
+  let mockBrandService: any;
 
   const testBrand: Brand = {
     id: 'test-brand',
@@ -18,35 +17,32 @@ describe('BrandRxjsDisplayComponent', () => {
     logo: 'test-logo.png',
   };
 
+  const testContent: BrandContent = {
+    title: 'Test Title',
+    subtitle: 'Test Subtitle',
+    heroImage: 'test-hero.png',
+    ctaText: 'Test CTA',
+  };
+
   beforeEach(async () => {
-    mockBrandRxjsService = {
-      loadBrand: jest.fn(),
-      currentBrand$: of(testBrand),
-      content$: of({
-        title: 'Test Title',
-        subtitle: 'Test Subtitle',
-        heroImage: 'test-hero.png',
-        ctaText: 'Test CTA',
-      }),
+    mockBrandService = {
+      brand$: of(testBrand),
+      content$: of(testContent),
     };
 
     await TestBed.configureTestingModule({
       imports: [BrandRxjsDisplayComponent],
       providers: [
         {
-          provide: BrandRxjsService,
-          useValue: mockBrandRxjsService,
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: { queryParams: of({ brand: 'test-brand' }) },
+          provide: BrandService,
+          useValue: mockBrandService,
         },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges(); // Trigger ngOnInit
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -66,94 +62,46 @@ describe('BrandRxjsDisplayComponent', () => {
   it('should display content title and subtitle', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('mat-card-content h1')?.textContent).toContain(
-      'Test Title'
+      testContent.title
     );
     expect(compiled.querySelector('mat-card-content p')?.textContent).toContain(
-      'Test Subtitle'
+      testContent.subtitle
     );
   });
 
   it('should display content hero image and CTA text', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('mat-card img')?.getAttribute('src')).toBe(
-      'test-hero.png'
+      testContent.heroImage
     );
     expect(compiled.querySelector('mat-card-content button')?.textContent).toContain(
-      'Test CTA'
+      testContent.ctaText
     );
-  });
-});
-
-describe('BrandRxjsDisplayComponent - Default Brand', () => {
-  let component: BrandRxjsDisplayComponent;
-  let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
-  let mockBrandRxjsService: any;
-
-  beforeEach(async () => {
-    mockBrandRxjsService = {
-      loadBrand: jest.fn(),
-      currentBrand$: of({} as Brand), // Provide a minimal mock brand
-      content$: of({} as BrandContent), // Provide minimal mock content
-    };
-
-    await TestBed.configureTestingModule({
-      imports: [BrandRxjsDisplayComponent],
-      providers: [
-        {
-          provide: BrandRxjsService,
-          useValue: mockBrandRxjsService,
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: { queryParams: of({}) }, // No 'brand' query param
-        },
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges(); // Trigger ngOnInit
-  });
-
-  it('should load default brand if no query param is provided', () => {
-    expect(mockBrandRxjsService.loadBrand).toHaveBeenCalledWith('acme');
   });
 });
 
 describe('BrandRxjsDisplayComponent - Loading State', () => {
-  let component: BrandRxjsDisplayComponent;
   let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
-  let mockBrandRxjsService: any;
-  let currentBrandSubject: Subject<Brand | null>;
-  let contentSubject: Subject<BrandContent | null>;
+  let mockBrandService: any;
 
   beforeEach(async () => {
-    currentBrandSubject = new Subject<Brand | null>();
-    contentSubject = new Subject<BrandContent | null>();
-
-    mockBrandRxjsService = {
-      loadBrand: jest.fn(),
-      currentBrand$: currentBrandSubject.asObservable(),
-      content$: contentSubject.asObservable(),
+    mockBrandService = {
+      brand$: new Subject<Brand | null>(),
+      content$: new Subject<BrandContent | null>(),
     };
 
     await TestBed.configureTestingModule({
       imports: [BrandRxjsDisplayComponent],
       providers: [
         {
-          provide: BrandRxjsService,
-          useValue: mockBrandRxjsService,
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: { queryParams: of({ brand: 'test-brand' }) },
+          provide: BrandService,
+          useValue: mockBrandService,
         },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges(); // Trigger ngOnInit
+    fixture.detectChanges();
   });
 
   it('should display loading message when brand is not yet loaded', () => {

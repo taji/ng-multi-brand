@@ -20,22 +20,14 @@ import { Brand, BrandContent } from '../core/brand.interface';
   templateUrl: './brand-signals-display.component.html',
   styleUrls: ['./brand-signals-display.component.scss']
 })
-export class BrandSignalsDisplayComponent implements OnInit {
+export class BrandSignalsDisplayComponent {
   brand: Signal<Brand | null>;
   content: Signal<BrandContent | null>;
 
   constructor(
-    private brandService: BrandService,
-    private route: ActivatedRoute
+    private brandService: BrandService
   ) {
-    this.brand = this.brandService.getCurrentBrand();
-    this.content = this.brandService.getContent();
-  }
-
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      const brandId = params['brand'] || 'acme';
-      this.brandService.loadBrand(brandId);
-    });
+    this.brand = this.brandService.brand;
+    this.content = this.brandService.content;
   }
 }

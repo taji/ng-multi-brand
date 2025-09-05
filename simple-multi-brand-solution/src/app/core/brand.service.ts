@@ -1,38 +1,42 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
+import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Brand, BrandContent } from './brand.interface';
 
 @Injectable({ providedIn: 'root' })
 export class BrandService {
-  private currentBrand = signal<Brand | null>(null);
-  private content = signal<BrandContent | null>(null);
+  // Internal State (RxJS)
+  private brandSubject = new BehaviorSubject<Brand | null>(null);
+  private contentSubject = new BehaviorSubject<BrandContent | null>(null);
+
+  // Exposed as Observables
+  brand$: Observable<Brand | null> = this.brandSubject.asObservable();
+  content$: Observable<BrandContent | null> = this.contentSubject.asObservable();
+
+  // Exposed as Signals
+  brand: Signal<Brand | null> = toSignal(this.brand$, { initialValue: null });
+  content: Signal<BrandContent | null> = toSignal(this.content$, { initialValue: null });
 
   constructor(private http: HttpClient) {}
 
-  getCurrentBrand() {
-    return this.currentBrand.asReadonly();
-  }
-
-  getContent() {
-    return this.content.asReadonly();
-  }
-
-  async loadBrand(brandId: string) {
-    try {
-      const brand = await this.http.get<Brand>(`http://localhost:3001/api/brands/${brandId}`).toPromise();
-      const brandContent = await this.http.get<BrandContent>(`http://localhost:3001/api/content/${brandId}`).toPromise();
-      
-      this.currentBrand.set(brand!);
-      this.content.set(brandContent!);
-      this.applyTheme(brand!);
-    } catch (error) {
-      console.error('Failed to load brand:', error);
-    }
-  }
-
-  private applyTheme(brand: Brand) {
-    document.documentElement.style.setProperty('--brand-primary', brand.primaryColor);
-    document.documentElement.style.setProperty('--brand-secondary', brand.secondaryColor);
+  loadBrand(brandId: string): void {
+    forkJoin({
+      brand: this.http.get<Brand>(`http://localhost:3001/api/brands/${brandId}`),
+      content: this.http.get<BrandContent>(`http://localhost:3001/api/content/${brandId}`)
+    }).pipe(
+      tap(({ brand, content }) => {
+        this.brandSubject.next(brand);
+        this.contentSubject.next(content);
+      }),
+      catchError(error => {
+        console.error('Failed to load brand:', error);
+        // Reset subjects on error
+        this.brandSubject.next(null);
+        this.contentSubject.next(null);
+        return [];
+      })
+    ).subscribe();
   }
 }
