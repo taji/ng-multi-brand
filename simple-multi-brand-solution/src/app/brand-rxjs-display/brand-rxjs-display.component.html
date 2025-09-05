@@ -1,23 +1,16 @@
-    <div class="app-container">
-      @if (brand$ | async; as brand) {
-        <mat-toolbar color="primary">
-          <img [src]="brand.logo" [alt]="brand.name" class="logo">
-          <span>{{ brand.name }}</span>
-        </mat-toolbar>
-
-        <main class="main-content">
-          @if (content$ | async; as content) {
-            <mat-card class="hero-card">
-              <img [src]="content.heroImage" [alt]="content.title" class="hero-image">
-              <mat-card-content>
-                <h1>{{ content.title }}</h1>
-                <p>{{ content.subtitle }}</p>
-                <button mat-raised-button color="primary">{{ content.ctaText }}</button>
-              </mat-card-content>
-            </mat-card>
-          }
-        </main>
-      } @else {
-        <div class="loading">Loading brand (RxJS)...</div>
-      }
-    </div>
+<div class="app-container">
+  <main class="main-content">
+    @if (content$ | async; as content) {
+      <mat-card class="hero-card">
+        <img [src]="content.heroImage" [alt]="content.title" class="hero-image">
+        <mat-card-content>
+          <h1>{{ content.title }}</h1>
+          <p>{{ content.subtitle }}</p>
+          <button mat-raised-button color="primary">{{ content.ctaText }}</button>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <div class="loading">Loading brand (RxJS)...</div>
+    }
+  </main>
+</div>

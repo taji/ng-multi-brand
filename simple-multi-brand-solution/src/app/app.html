@@ -1,3 +1,10 @@
+@if (brand(); as b) {
+  <mat-toolbar color="primary">
+    <img [src]="b.logo" [alt]="b.name" class="logo" />
+    <span>{{ b.name }}</span>
+  </mat-toolbar>
+}
+
 <div>
   <h2>NG Rxjs Implementation</h2>
   <app-brand-rxjs-display></app-brand-rxjs-display>
