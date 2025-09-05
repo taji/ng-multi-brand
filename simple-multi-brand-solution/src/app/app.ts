@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { BrandRxjsDisplayComponent } from './brand-rxjs-display/brand-rxjs-display.component';
-import { BrandSignalsDisplayComponent } from './brand-signals-display/brand-signals-display.component';
+import { HeroRxjsComponent } from './hero-rxjs/hero-rxjs.component';
+import { HeroSignalsComponent } from './hero-signals/hero-signals.component';
 import { ThemeService } from './core/theme.service';
 import { BrandService } from './core/brand.service';
 
@@ -11,8 +11,8 @@ import { BrandService } from './core/brand.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    BrandRxjsDisplayComponent,
-    BrandSignalsDisplayComponent,
+    HeroRxjsComponent,
+    HeroSignalsComponent,
     MatToolbarModule,
   ],
   templateUrl: './app.html',

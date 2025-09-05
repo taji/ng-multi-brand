@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Signal, computed } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -6,11 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { BrandService } from '../core/brand.service';
 import { Brand, HeroContent } from '../core/brand.interface';
-import { Observable, of } from 'rxjs';
-import { filter, switchMap } from 'rxjs/operators';
+import { switchMap, filter } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
-  selector: 'app-brand-rxjs-display',
+  selector: 'app-hero-signals',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,23 +20,22 @@ import { filter, switchMap } from 'rxjs/operators';
     MatButtonModule,
     MatCardModule
   ],
-  templateUrl: './brand-rxjs-display.component.html',
-  styleUrls: ['./brand-rxjs-display.component.scss']
+  templateUrl: './hero-signals.component.html',
+  styleUrls: ['./hero-signals.component.scss']
 })
-export class BrandRxjsDisplayComponent implements OnInit {
-  brand$: Observable<Brand | null>;
-  content$!: Observable<HeroContent>;
+export class HeroSignalsComponent {
+  brand: Signal<Brand | null>;
+  content: Signal<HeroContent | undefined>;
 
   constructor(
     private brandService: BrandService
   ) {
-    this.brand$ = this.brandService.brand$;
-  }
+    this.brand = this.brandService.brand;
 
-  ngOnInit(): void {
-    this.content$ = this.brand$.pipe(
+    const brandId$ = toObservable(this.brand).pipe(
       filter((brand): brand is Brand => brand !== null),
       switchMap(brand => this.brandService.getHeroContent(brand.id))
     );
+    this.content = toSignal(brandId$);
   }
 }

@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrandRxjsDisplayComponent } from './brand-rxjs-display.component';
+import { HeroRxjsComponent } from './hero-rxjs.component';
 import { BrandService } from '../core/brand.service';
 import { of, Subject } from 'rxjs';
 import { Brand, HeroContent } from '../core/brand.interface';
+import { first } from 'rxjs/operators';
 
-describe('BrandRxjsDisplayComponent', () => {
-  let component: BrandRxjsDisplayComponent;
-  let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
+describe('HeroRxjsComponent', () => {
+  let component: HeroRxjsComponent;
+  let fixture: ComponentFixture<HeroRxjsComponent>;
   let mockBrandService: any;
   let brandSubject: Subject<Brand | null>;
 
@@ -33,7 +34,7 @@ describe('BrandRxjsDisplayComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [BrandRxjsDisplayComponent],
+      imports: [HeroRxjsComponent],
       providers: [
         {
           provide: BrandService,
@@ -42,7 +43,7 @@ describe('BrandRxjsDisplayComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
+    fixture = TestBed.createComponent(HeroRxjsComponent);
     component = fixture.componentInstance;
   });
 
