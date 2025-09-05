@@ -6,7 +6,7 @@ export interface Brand {
   logo: string;
 }
 
-export interface BrandContent {
+export interface HeroContent {
   title: string;
   subtitle: string;
   heroImage: string;

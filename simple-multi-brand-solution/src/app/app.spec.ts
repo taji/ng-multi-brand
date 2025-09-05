@@ -5,15 +5,14 @@ import { signal } from '@angular/core';
 import { AppComponent } from './app';
 import { BrandService } from './core/brand.service';
 import { ThemeService } from './core/theme.service';
-import { Brand, BrandContent } from './core/brand.interface';
+import { Brand, HeroContent } from './core/brand.interface';
 
 // A more complete mock for BrandService
 class MockBrandService {
   // Mock properties for child components
   brand$ = of(null as Brand | null);
-  content$ = of(null as BrandContent | null);
   brand = signal<Brand | null>(null);
-  content = signal<BrandContent | null>(null);
+  getHeroContent = jest.fn().mockReturnValue(of(null as HeroContent | null));
 
   // Mock method for AppComponent logic
   loadBrand = jest.fn();

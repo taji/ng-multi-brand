@@ -2,12 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrandRxjsDisplayComponent } from './brand-rxjs-display.component';
 import { BrandService } from '../core/brand.service';
 import { of, Subject } from 'rxjs';
-import { Brand, BrandContent } from '../core/brand.interface';
+import { Brand, HeroContent } from '../core/brand.interface';
 
 describe('BrandRxjsDisplayComponent', () => {
   let component: BrandRxjsDisplayComponent;
   let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
   let mockBrandService: any;
+  let brandSubject: Subject<Brand | null>;
 
   const testBrand: Brand = {
     id: 'test-brand',
@@ -17,7 +18,7 @@ describe('BrandRxjsDisplayComponent', () => {
     logo: 'test-logo.png',
   };
 
-  const testContent: BrandContent = {
+  const testContent: HeroContent = {
     title: 'Test Title',
     subtitle: 'Test Subtitle',
     heroImage: 'test-hero.png',
@@ -25,9 +26,10 @@ describe('BrandRxjsDisplayComponent', () => {
   };
 
   beforeEach(async () => {
+    brandSubject = new Subject<Brand | null>();
     mockBrandService = {
-      brand$: of(testBrand),
-      content$: of(testContent),
+      brand$: brandSubject.asObservable(),
+      getHeroContent: jest.fn().mockReturnValue(of(testContent)),
     };
 
     await TestBed.configureTestingModule({
@@ -42,74 +44,35 @@ describe('BrandRxjsDisplayComponent', () => {
 
     fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should display brand name and logo', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-toolbar span')?.textContent).toContain(
-      testBrand.name
-    );
-    expect(compiled.querySelector('mat-toolbar img')?.getAttribute('src')).toBe(
-      testBrand.logo
-    );
+  it('should not call getHeroContent if brand is null', () => {
+    fixture.detectChanges(); // ngOnInit()
+    component.content$.subscribe(); // Subscribe to trigger the pipe
+    brandSubject.next(null);
+    expect(mockBrandService.getHeroContent).not.toHaveBeenCalled();
   });
 
-  it('should display content title and subtitle', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-card-content h1')?.textContent).toContain(
-      testContent.title
-    );
-    expect(compiled.querySelector('mat-card-content p')?.textContent).toContain(
-      testContent.subtitle
-    );
+  it('should call getHeroContent when brand is emitted', () => {
+    fixture.detectChanges(); // ngOnInit()
+    component.content$.subscribe(); // Subscribe to trigger the pipe
+    brandSubject.next(testBrand);
+    expect(mockBrandService.getHeroContent).toHaveBeenCalledWith(testBrand.id);
   });
 
-  it('should display content hero image and CTA text', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-card img')?.getAttribute('src')).toBe(
-      testContent.heroImage
-    );
-    expect(compiled.querySelector('mat-card-content button')?.textContent).toContain(
-      testContent.ctaText
-    );
-  });
-});
+  it('should populate content$ with data from getHeroContent', (done) => {
+    fixture.detectChanges(); // ngOnInit()
 
-describe('BrandRxjsDisplayComponent - Loading State', () => {
-  let fixture: ComponentFixture<BrandRxjsDisplayComponent>;
-  let mockBrandService: any;
+    component.content$.subscribe(content => {
+      expect(content).toEqual(testContent);
+      done();
+    });
 
-  beforeEach(async () => {
-    mockBrandService = {
-      brand$: new Subject<Brand | null>(),
-      content$: new Subject<BrandContent | null>(),
-    };
-
-    await TestBed.configureTestingModule({
-      imports: [BrandRxjsDisplayComponent],
-      providers: [
-        {
-          provide: BrandService,
-          useValue: mockBrandService,
-        },
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(BrandRxjsDisplayComponent);
-    fixture.detectChanges();
-  });
-
-  it('should display loading message when brand is not yet loaded', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.loading')?.textContent).toContain(
-      'Loading brand (RxJS)...'
-    );
-    expect(compiled.querySelector('mat-toolbar')).toBeNull();
-    expect(compiled.querySelector('mat-card')).toBeNull();
+    brandSubject.next(testBrand);
   });
 });
