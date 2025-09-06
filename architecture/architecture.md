@@ -3,34 +3,22 @@
 ## System Overview
 
 ```mermaid
-graph TB
-    %% make connectors visible everywhere
-    linkStyle default stroke:#1E90FF,stroke-width:2px;
-
+graph TD
     subgraph "Client Zone"
-        User[User Browser]
-        Router[Angular Router]
-        App[App Component]
-        QueryParams[Query Parameters]
-        BrandResolver[Brand Resolution]
-        UI[Material UI Components]
-        BrandService[Brand Service]
-        Signals[Angular Signals]
-        Theme[Dynamic Theming]
-        CSS[CSS Custom Properties]
-        BrowserAssetFetcher[Browser Asset Fetcher]
+        U[User] --> R(Angular Router)
+        R --> A(App Component)
+        A -- "loads global brand" --> BS(Brand Service)
+        BS -- "provides brand state" --> TS(Theme Service)
+        TS --> CSS[CSS Custom Properties]
 
-        User --> Router
-        Router --> App
-        App --> BrandService
-        App --> UI
-        BrandService --> Signals
-        Signals --> Theme
-        Theme --> CSS
-        Router --> QueryParams
-        QueryParams --> BrandResolver
-        BrandResolver --> BrandService
-        App --> BrowserAssetFetcher
+        BS -- "provides brand$" --> HRX(Hero RxJS Component)
+        HRX -- "requests hero content" --> BS
+        BS -- "provides brand signal" --> HSG(Hero Signals Component)
+        HSG -- "requests hero content" --> BS
+
+        HRX --> UI[Material UI Components]
+        HSG --> UI
+        UI --> U
     end
 
     subgraph "Application Zone"
@@ -40,17 +28,18 @@ graph TB
     subgraph "Data Zone"
         AS[AWS AppSync]
         S3CF[Amazon S3/CloudFront]
-        BrandData[(Brand Data)]
-        ContentData[(Content Data)]
+        BD[(Brand Data)]
+        HCD[(Hero Content Data)]
 
-        AS --> BrandData
-        AS --> ContentData
-        BrowserAssetFetcher --> S3CF
+        AS --> BD
+        AS --> HCD
     end
 
-    BrandService --> BFF
+    BS --> BFF
     BFF --> AS
     BFF --> S3CF
+    S3CF -- "serves assets" --> Browser[Browser Asset Fetcher]
+    Browser --> U
 ```
 
 ## Data Flow
@@ -60,10 +49,10 @@ sequenceDiagram
     participant U as User
     participant R as Angular Router
     participant A as App Component
-    participant BS as Brand Service
-    participant TS as Theme Service
     participant UI as UI Components
     participant DOM as DOM/CSS
+    participant BS as Brand Service
+    participant TS as Theme Service
     participant BFF as Backend For Frontend
 
     U->>R: Visit ?brand=acme
